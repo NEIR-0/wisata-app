@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import CardDiary from "../component/cardDiary";
 import { getDiaryFeed } from "../../../api/cms";
 import Loading from "../component/loading";
+import { getDiaryContentSEOAttributes, getSizeOptimizedImageUrl } from "../../../utils/cms";
 
 function DiaryFeedPage() {
   const [data, setData] = useState([]);
@@ -11,7 +12,16 @@ function DiaryFeedPage() {
     const fetchDiary = async () => {
       try {
         const response = await getDiaryFeed();
-        setData(response);
+        const enhancedContent = response?.content.map((item) => {
+          const seo = getDiaryContentSEOAttributes(item);
+          const optimizedImage = getSizeOptimizedImageUrl(seo?.image, "md");
+          return {
+            id: item?.id,
+            seo,
+            optimizedImage,
+          };
+        });
+        setData(enhancedContent);  
       } catch (error) {
         console.error("Error fetching diary feed:", error);
       } finally {
@@ -31,8 +41,8 @@ function DiaryFeedPage() {
         </div>
       ) : (
       <div className={`w-full ${data?.length <= 2 ? "h-full" : "h-fit"} flex items-start justify-center bg-white`}>
-        <div className="w-[40%] flex-col h-fit flex items-start justify-center">
-          {data?.content?.map((item, index) => (
+        <div className="w-full md:w-[60%] lg:w-[40%] flex-col h-fit flex items-start justify-center">
+          {data?.map((item, index) => (
             <CardDiary key={index} data={item} />
           ))}
         </div>
