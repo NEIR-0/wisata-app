@@ -5,8 +5,8 @@ import DiaryFeedPage from "../src/view/diaryFeedPage";
 import DiaryContentPage from "../src/view/diaryContentPage ";
 
 const publicRoutes = [
-    { path: "/", element: <DiaryFeedPage /> },
-    { path: "detail/:id", element: <DiaryContentPage /> },
+    { path: "diary/", element: <DiaryFeedPage /> },
+    { path: "diary/:id", element: <DiaryContentPage /> },
 ];
 
 const router = createBrowserRouter([
