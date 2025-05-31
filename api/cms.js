@@ -22,7 +22,11 @@ export async function getDiaryFeed() {
     253782,
     177123,
   ]
-  ...
+  const params = new URLSearchParams();
+  params.append('status', 'posted');
+  ids.forEach(id => params.append('id', id));
+
+  return await apiClient('/cms/diary?' + params.toString());
 }
 
 /**
@@ -35,5 +39,8 @@ export async function getDiaryFeed() {
  * - `status` param must exist and have value of `'posted'`
  */
 export async function getDiaryContentById(id) {
-  ...
+  return await apiClient('/cms/diary', {
+    id,
+    status: 'posted'
+  })
 }
