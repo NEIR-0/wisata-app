@@ -31,46 +31,46 @@ const CDN_TWITTER_IMG_SIZE = {
  *
  * Note that some images may not have optimized URL variants.
  */
-export function getSizeOptimizedImageUrl(originalUrl, desiredSize) {
-  if (!originalUrl || !desiredSize) return originalUrl;
+export function getSizeOptimizedImageUrl(originalUrl, size) {
+  if(!originalUrl || !size) return originalUrl;
 
-  const wisataSizes = Object.values(CDN_WISATA_IMG_SIZE);
-  const twitterSizes = Object.values(CDN_TWITTER_IMG_SIZE);
-  const lowerSize = desiredSize.toLowerCase();
+  const desiredSize = size.toUpperCase();
   
-  if (originalUrl.startsWith(CDN_WISATA_URL)) {
-    if (!wisataSizes.includes(lowerSize)) return originalUrl;
-
-    const lastDotIndex = originalUrl.lastIndexOf(".");
-    if (lastDotIndex === -1) return originalUrl;
-
-    const base = originalUrl.slice(0, lastDotIndex);
-    const extension = originalUrl.slice(lastDotIndex);
-
-    const sizeSuffixRegex = new RegExp(`_(${wisataSizes.join("|")})$`);
-    if (sizeSuffixRegex.test(base)) {
-      const newBase = base.replace(sizeSuffixRegex, `_${lowerSize}`);
-      return `${newBase}${extension}`;
-    } else {
-      return `${base}_${lowerSize}${extension}`;
+  if(originalUrl.startsWith(CDN_WISATA_URL)){
+    const startIndexImgSize = originalUrl.lastIndexOf("_");
+    const startIndexExtensions = originalUrl.lastIndexOf(".");
+    
+    let formatingUrl = originalUrl;
+    if(!startIndexImgSize == -1){
+      const cleanUrl = originalUrl.slice(0, startIndexImgSize) + originalUrl.slice(startIndexExtensions);
+      formatingUrl = cleanUrl;
     }
+    
+    let imgSize = CDN_WISATA_IMG_SIZE?.[desiredSize]
+    const lengthRawUrl = formatingUrl.lastIndexOf('.');
+    const extensitons = formatingUrl.slice(lengthRawUrl)
+    const url = formatingUrl.slice(0, lengthRawUrl)
+
+    const result = `${url}_${imgSize}${extensitons}`;
+    return result
   }
 
-  if (originalUrl.startsWith(CDN_TWITTER_URL)) {
-    const twitterSize = CDN_TWITTER_IMG_SIZE[lowerSize];
-    if (!twitterSizes.includes(twitterSize)) return originalUrl;
-
-    const url = new URL(originalUrl);
-
-    if (url.searchParams.has("name")) {
-      url.searchParams.set("name", twitterSize);
-    } else {
-      url.searchParams.append("name", twitterSize);
+  if(originalUrl.startsWith(CDN_TWITTER_URL)){
+    const startIndexImgSize = originalUrl.lastIndexOf("&");
+    let formatingUrl = originalUrl;
+    if(!startIndexImgSize == -1){
+      const cleanUrl = originalUrl.slice(0, startIndexImgSize);
+      formatingUrl = cleanUrl;
     }
-    return url.toString();
-  }
 
-  return originalUrl;
+    let imgSize = CDN_TWITTER_IMG_SIZE?.[desiredSize]
+    const indexExtensionsStart = formatingUrl.lastIndexOf('?');
+    const lengthRawUrl = formatingUrl.slice(0, indexExtensionsStart);    
+    const format = formatingUrl.slice(indexExtensionsStart);
+
+    const result = `${lengthRawUrl}${format}&name=${imgSize}`;
+    return result;    
+  }
 }
 
 /**
